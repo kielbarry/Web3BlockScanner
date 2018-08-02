@@ -82,33 +82,14 @@ async function getAllBlockStats(input) {
 
 	if(!input[1]) {
 		let cb = currentBlock
-		// for(let i = 0; i < input[0]; i++) {
-		// 	let b = cb-i
-		// 	web3.eth.getBlock(b, true, (err, resp) => {
-	 //    		if(err) console.log("err in getblockstats: ",err);
-	 //    		MasterBlock[i] = getBlockStats(resp)
-	 //    	}).then(resp => organizeBlockStats(MasterBlock))
-		// }
 		await getBlockWrapperSingle(cb, input[0]).then(resp => organizeBlockStats(resp))
-		
- 
 	}
 	else {
-
 		await getBlockWrapperRange(input).then(resp => organizeBlockStats(resp))
-		// let i = 0;
-		// for(var b = input[0]; b <= input[1]; b++) {
-		// 	web3.eth.getBlock(b, true, (err, resp) => {
-	 //    		if(err) console.log("err in getblockstats: ",err);
-	 //    		MasterBlock[i] = getBlockStats(resp)
-	 //    	}).then(resp => organizeBlockStats(MasterBlock))
-	 //    	i++;
-		// }
 	}
 }
 
 async function getBlockWrapperSingle(cb, input) {
-	console.log("here BBBBBBBBBB")
 	let MasterBlock = [];
 	for(let i = 0; i < input; i++) {
 		let b = cb-i
@@ -211,13 +192,9 @@ async function organizeBlockStats(newArr) {
 	let TotalContractsCreated = 0;
 	let TotalContractsTransactions = 0;
 	let TotalUncles = 0;
-
 	let TotalUniqueContracts = {};
 	let TotalUniqueFroms = {};
 	let TotalUniqueTos = {};
-
-	let uniqueFroms = {};
-	let uniqueTos ={};
 
 	arr.map(b => {
 
@@ -225,18 +202,13 @@ async function organizeBlockStats(newArr) {
 			console.log(
 				chalk.green("\tContract Addr"), 
 				chalk.yellow(key),
-				// chalk.green("\tValue Sent"),
-				// chalk.yellow(b.contracts[key])
 			)
-
 			if(!TotalUniqueContracts[key]) {
 				TotalUniqueContracts[key] = b.contracts[key]
 			} else {
 				TotalUniqueContracts[key] += b.contracts[key]
 			}
-
 		})
-
 		Object.keys(b.from).map(key => {
 			console.log(
 				chalk.green("\tFrom Addr"), 
@@ -244,15 +216,12 @@ async function organizeBlockStats(newArr) {
 				chalk.green("\tValue Sent"),
 				chalk.yellow(b.from[key])
 			)
-
 			if(!TotalUniqueFroms[key]) {
 				TotalUniqueFroms[key] = b.from[key]
 			} else {
 				TotalUniqueFroms[key] += b.from[key]
 			}
-
 		})
-
 		Object.keys(b.to).map(key => {
 			console.log(
 				chalk.green("\tTo Addr"), 
@@ -260,13 +229,11 @@ async function organizeBlockStats(newArr) {
 				chalk.green("\tValue Sent"),
 				chalk.yellow(b.to[key])
 			)
-
 			if(!TotalUniqueTos[key]) {
 				TotalUniqueTos[key] = b.to[key]
 			} else {
 				TotalUniqueTos[key] += b.to[key]
 			}
-
 		})
 
 		console.log(
@@ -299,27 +266,25 @@ async function organizeBlockStats(newArr) {
 
 	Object.keys(TotalUniqueContracts).map(key => {
 		console.log(
-				chalk.green("\Contract Addr"), 
-				chalk.yellow(key),
-				// chalk.green("\tValue Sent"),
-				// chalk.yellow(TotalUniqueContracts[key])
-			)
+			chalk.green("\tContract Addr"), 
+			chalk.yellow(key),
+		)
 	})
 	Object.keys(TotalUniqueFroms).map(key => {
 		console.log(
-				chalk.green("\From Addr"), 
-				chalk.yellow(key),
-				chalk.green("\tValue Sent"),
-				chalk.yellow(TotalUniqueFroms[key])
-			)
+			chalk.green("\tFrom Addr"), 
+			chalk.yellow(key),
+			chalk.green("\tValue Sent"),
+			chalk.yellow(TotalUniqueFroms[key])
+		)
 	})
 	Object.keys(TotalUniqueTos).map(key => {
 		console.log(
-				chalk.green("\To Addr"), 
-				chalk.yellow(key),
-				chalk.green("\tValue Sent"),
-				chalk.yellow(TotalUniqueTos[key])
-			)
+			chalk.green("\tTo Addr"), 
+			chalk.yellow(key),
+			chalk.green("\tValue Sent"),
+			chalk.yellow(TotalUniqueTos[key])
+		)
 	})
 
 

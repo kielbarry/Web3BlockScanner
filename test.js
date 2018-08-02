@@ -40,13 +40,15 @@ describe('ValidInput', function(){
 
 describe('CorrectAnalysis', function(){
 	it('should return true for small object', function(){
-		var isCorrect = funcs.getBlockStats(testData.testBlock1)
-		isCorrect.should.be.deep.equal(testData.testBlock1Answer)
+		funcs.getBlockStats(testData.testBlock1).then(resp => {
+			resp.should.be.deep.equal(testData.testBlock1Answer)
+		})
 	});
 
 	it('should return true for ropsten block 3717820', function(){
-		var isCorrect = funcs.getBlockStats(testData.testBlock2)
-		isCorrect.should.be.deep.equal(testData.testBlock2Answer)
+		funcs.getBlockStats(testData.testBlock2).then(resp => {
+			resp.should.be.deep.equal(testData.testBlock2Answer)			
+		})
 	});
 });
 

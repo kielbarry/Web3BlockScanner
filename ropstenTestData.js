@@ -367,6 +367,11 @@ let testBlock2Answer = {
      '0x86C65673bEFD323f5255905e267f5b34d453924c': 0.1,
      '0x725ca2A01d5006c22172eC602C8923139b8Bfc4E': 9,
      '0x7455530BE355aD45a942360DFf71a8Eb1E714783': 1 },
+  contracts:
+   { '0xd1E36aC88dB0f6Ef95421f78e7a9cDFB3aA88Ddd': 0,
+     '0x7299192CD862c9c5345cC47a2Ef24807436009b0': 0,
+     '0x56ddC3eBc75525f0ea4601a5BF97dd8a35877beF': 0,
+     '0x75237811638EB37f898339c9FA19c9b1c764886c': 0 },
   uniqueReceivedAddress: 4,
   uniqueSentAddresses: 3,
   transactionCount: 12,

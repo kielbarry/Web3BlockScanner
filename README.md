@@ -1,11 +1,13 @@
 This is a CLI program is an Ethereum block explorer using Web3.js and an Infura Web Socket, built in NodeJS.
 
 You may supply the program either 
+	*
 	1. a single number, which will be used to analyze all blocks between the current block (cb) and cb minus that number; or,
-	2. two numbers, each representing a blocknumber, which will be used to analyze those blocks inclusive, as well as those in betwee.
-
+	2. two numbers, each representing a blocknumber, which will be used to analyze those blocks inclusive, as well as those in between.
+	*
 
 Each Block explored display a summary table, listing:
+	*
 	1. The block number,
 	2. The total number of transactions,
 	3. The total number of unique 'from' addresses,

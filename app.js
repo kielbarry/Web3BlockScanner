@@ -75,21 +75,22 @@ function returnIsValid(input){
 }
 
 // getAllBlockStats retrieves stats based on wether 1 or 2 arguments were supplied.
-function getAllBlockStats(input) {
+async function getAllBlockStats(input) {
 
 	// TODO: web.eth.filter here
 	let MasterBlock = [];
 
 	if(!input[1]) {
 		let cb = currentBlock
-		for(let i = 0; i < input[0]; i++) {
-			let b = cb-i
-			console.log(b)
-			web3.eth.getBlock(b, true, (err, resp) => {
-	    		if(err) console.log("err in getblockstats: ",err);
-	    		MasterBlock[i] = getBlockStats(resp)
-	    	}).then(resp => organizeBlockStats(MasterBlock))
-		}
+		// for(let i = 0; i < input[0]; i++) {
+		// 	let b = cb-i
+		// 	web3.eth.getBlock(b, true, (err, resp) => {
+	 //    		if(err) console.log("err in getblockstats: ",err);
+	 //    		MasterBlock[i] = getBlockStats(resp)
+	 //    	}).then(resp => organizeBlockStats(MasterBlock))
+		// }
+		await getBlockWrapper(cb, input[0]).then(resp => organizeBlockStats(resp))
+		
  
 	}
 	else {
@@ -105,7 +106,21 @@ function getAllBlockStats(input) {
 }
 
 
-function getBlockStats(block){
+async function getBlockWrapper(cb, input) {
+	console.log("here BBBBBBBBBB")
+	let MasterBlock = [];
+	for(let i = 0; i < input; i++) {
+		let b = cb-i
+		MasterBlock[i] = await web3.eth.getBlock(b, true, (err, resp) => {
+    		if(err) console.log("err in getblockstats: ",err);
+    		return getBlockStats(resp)
+    	})
+	}
+	return  MasterBlock
+}
+
+
+async function getBlockStats(block){
 
 	var bt = {
 		"number" : block["number"],
@@ -123,24 +138,6 @@ function getBlockStats(block){
 	if(block["uncles"]) bt["uncles"] = block["uncles"].length
 
 	if(null == block["transactions"]) return bt;
-
-	// if(BlockStatsCache[block["number"]] !== undefined && block["number"] != currentBlock) {
-	// 	return BlockStatsCache[bt["number"]]
-	// }
-
-
-	// console.log(block.transactions)
-	// block["transactions"].map(tx => {
-	// 	console.log(
-	// 		chalk.green("\tfrom"), 
-	// 		chalk.yellow(tx.from), 
-	// 		chalk.green("\tto"), 
-	// 		chalk.yellow(tx.to), 
-	// 		chalk.green("\tvalue"), 
-	// 		chalk.yellow(parseFloat(web3.utils.fromWei(tx.value)))
-	// 	)
-	// 	// if(tx.to =='0x18c7dfa7d3a130bcf35129eaf3ba4d58e5563158') console.log(tx) 
-	// })
 
 	block["transactions"].map(tx => {
 
@@ -168,16 +165,12 @@ function getBlockStats(block){
 	bt["uniqueSentAddresses"] = Object.keys(bt["from"]).length
 	bt["uniqueReceivedAddress"] = Object.keys(bt["to"]).length
 
-	// if(BlockStatsCache[block["number"]] === undefined && block["number"] != currentBlock) {
-	// 	BlockStatsCache[bt["number"]] == bt;
-	// }
-
 	return bt
 }
 
-function organizeBlockStats(arr) {
+async function organizeBlockStats(arr) {
 
-	console.log(arr)
+	console.log("HERKLJHALSJHLDAKSJDH", arr)
 
 	let TotalSent = 0;
 	let TotalTransactions = 0;
@@ -186,8 +179,6 @@ function organizeBlockStats(arr) {
 	let TotalContractsCreated = 0;
 	let TotalContractsTransactions = 0;
 	let TotalUncles = 0;
-
-
 
 	let uniqueFroms = {};
 	let uniqueTos ={};

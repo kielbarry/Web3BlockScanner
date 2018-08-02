@@ -1,6 +1,6 @@
 # Web3BlockScanner
 
-## This is a CLI program is an Ethereum block explorer using Web3.js and an Infura Web Socket, built in NodeJS.
+## This CLI program is an Ethereum block explorer using Web3.js and an Infura Web Socket, built in NodeJS.
 
 ### You may supply the program either 
 	
@@ -45,4 +45,5 @@ To use this tool, you may either
  - Clone the repo from here: https://github.com/kielbarry/Web3BlockScanner.git
  - CD into that directory
  - Run npm install
- - Run npm test, and then wait,
+ - Run npm test
+ - If there is a delay after test success, exit the program and run node app.js from the root of the directory

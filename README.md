@@ -33,3 +33,14 @@ Before the summary table for each block, the program lists:
 -	1. Every unique 'from' address and its total spent in sum,
 -	2. Every unique 'to' address and its total received in sum,
 -	3. Every unique contract address.
+
+
+To use this tool, you may either
+ - Clone the repo
+ - Install globally as a cli through npm.
+
+ To get started with a clone,
+ - Clone the repo from here: https://github.com/kielbarry/Web3BlockScanner.git
+ - CD into that directory
+ - Run npm install
+ - Run npm test, and then wait,

@@ -89,24 +89,25 @@ async function getAllBlockStats(input) {
 	 //    		MasterBlock[i] = getBlockStats(resp)
 	 //    	}).then(resp => organizeBlockStats(MasterBlock))
 		// }
-		await getBlockWrapper(cb, input[0]).then(resp => organizeBlockStats(resp))
+		await getBlockWrapperSingle(cb, input[0]).then(resp => organizeBlockStats(resp))
 		
  
 	}
 	else {
-		let i = 0;
-		for(var b = input[0]; b <= input[1]; b++) {
-			web3.eth.getBlock(b, true, (err, resp) => {
-	    		if(err) console.log("err in getblockstats: ",err);
-	    		MasterBlock[i] = getBlockStats(resp)
-	    	}).then(resp => organizeBlockStats(MasterBlock))
-	    	i++;
-		}
+
+		await getBlockWrapperRange(input).then(resp => organizeBlockStats(resp))
+		// let i = 0;
+		// for(var b = input[0]; b <= input[1]; b++) {
+		// 	web3.eth.getBlock(b, true, (err, resp) => {
+	 //    		if(err) console.log("err in getblockstats: ",err);
+	 //    		MasterBlock[i] = getBlockStats(resp)
+	 //    	}).then(resp => organizeBlockStats(MasterBlock))
+	 //    	i++;
+		// }
 	}
 }
 
-
-async function getBlockWrapper(cb, input) {
+async function getBlockWrapperSingle(cb, input) {
 	console.log("here BBBBBBBBBB")
 	let MasterBlock = [];
 	for(let i = 0; i < input; i++) {
@@ -119,6 +120,19 @@ async function getBlockWrapper(cb, input) {
 	return  MasterBlock
 }
 
+async function getBlockWrapperRange(input) {
+	let MasterBlock = [];
+	let i = 0;
+	for(var b = input[0]; b <= input[1]; b++) {
+		MasterBlock[i] = await web3.eth.getBlock(b, true, (err, resp) => {
+    		if(err) console.log("err in getblockstats: ",err);
+    		return getBlockStats(resp)
+    	})
+    	i++;
+	}
+	return  MasterBlock
+}
+
 
 async function getBlockStats(block){
 
@@ -126,6 +140,7 @@ async function getBlockStats(block){
 		"number" : block["number"],
 		"from": {},
 		"to": {},
+		"contracts": {},
 		"uniqueSentAddresses": 0,
 		"uniqueReceivedAddress": 0,
 		"transactionCount": 0,
@@ -145,8 +160,20 @@ async function getBlockStats(block){
 
 		if (tx["to"] === null) {
 			bt["contractsCreated"]++;
+
+			if(!bt["contracts"][tx["from"]] ) {
+				bt["contracts"][tx["from"]]  = parseFloat(web3.utils.fromWei(tx["value"], 'ether'));
+			} else {
+				bt["contracts"][tx["from"]] += parseFloat(web3.utils.fromWei(tx["value"], 'ether'));
+			}
+
 		} else if (tx["value"] == 0) {
 			bt["contractsTransactions"]++;
+			if(!bt["contracts"][tx["from"]] ) {
+				bt["contracts"][tx["from"]]  = parseFloat(web3.utils.fromWei(tx["value"], 'ether'));
+			} else {
+				bt["contracts"][tx["from"]] += parseFloat(web3.utils.fromWei(tx["value"], 'ether'));
+			}
 		} else {
 
 			if(!bt["from"].hasOwnProperty(tx["from"])) bt["from"][tx["from"]] = 0;
@@ -168,9 +195,14 @@ async function getBlockStats(block){
 	return bt
 }
 
-async function organizeBlockStats(arr) {
+async function organizeBlockStats(newArr) {
 
-	console.log("HERKLJHALSJHLDAKSJDH", arr)
+	let arr = []
+	try {
+		arr = await Promise.all(newArr.map(b => getBlockStats(b)))
+	} catch(error) {
+		console.log("that one didn't work... please try again")
+	}
 
 	let TotalSent = 0;
 	let TotalTransactions = 0;
@@ -180,10 +212,63 @@ async function organizeBlockStats(arr) {
 	let TotalContractsTransactions = 0;
 	let TotalUncles = 0;
 
+	let TotalUniqueContracts = {};
+	let TotalUniqueFroms = {};
+	let TotalUniqueTos = {};
+
 	let uniqueFroms = {};
 	let uniqueTos ={};
 
 	arr.map(b => {
+
+		Object.keys(b.contracts).map(key => {
+			console.log(
+				chalk.green("\tContract Addr"), 
+				chalk.yellow(key),
+				// chalk.green("\tValue Sent"),
+				// chalk.yellow(b.contracts[key])
+			)
+
+			if(!TotalUniqueContracts[key]) {
+				TotalUniqueContracts[key] = b.contracts[key]
+			} else {
+				TotalUniqueContracts[key] += b.contracts[key]
+			}
+
+		})
+
+		Object.keys(b.from).map(key => {
+			console.log(
+				chalk.green("\tFrom Addr"), 
+				chalk.yellow(key),
+				chalk.green("\tValue Sent"),
+				chalk.yellow(b.from[key])
+			)
+
+			if(!TotalUniqueFroms[key]) {
+				TotalUniqueFroms[key] = b.from[key]
+			} else {
+				TotalUniqueFroms[key] += b.from[key]
+			}
+
+		})
+
+		Object.keys(b.to).map(key => {
+			console.log(
+				chalk.green("\tTo Addr"), 
+				chalk.yellow(key),
+				chalk.green("\tValue Sent"),
+				chalk.yellow(b.to[key])
+			)
+
+			if(!TotalUniqueTos[key]) {
+				TotalUniqueTos[key] = b.to[key]
+			} else {
+				TotalUniqueTos[key] += b.to[key]
+			}
+
+		})
+
 		console.log(
 			chalk.green("\tBlock"), 
 			chalk.yellow(b.number), 
@@ -191,7 +276,7 @@ async function organizeBlockStats(arr) {
 			chalk.yellow(b.transactionCount), 
 			chalk.green("\tUnique From Addr"), 
 			chalk.yellow(b.uniqueSentAddresses), 
-			chalk.green("\tUnique To Add"), 
+			chalk.green("\tUnique To Addr"), 
 			chalk.yellow(b.uniqueReceivedAddress), 
 			chalk.green("\tContracts Created"), 
 			chalk.yellow(b.contractsCreated),
@@ -209,33 +294,43 @@ async function organizeBlockStats(arr) {
 		TotalContractsTransactions += b.contractsTransactions;
 		TotalUncles += b.uncles;
 
-
-		// Object.keys(b.from).map(key => {
-		// 	// TotalSent += b.from[key]
-		// 	if(!Object.keys(uniqueFroms).includes(key)) {
-		// 		uniqueFroms[key] = b.from[key]
-		// 	} else {
-		// 		uniqueFroms[key] += b.from[key]
-		// 	}
-		// })
-
-		// Object.keys(b.to).map(key => {
-		// 	if(!Object.keys(uniqueTos).includes(key)) {
-		// 		uniqueTos[key] = b.to[key]
-		// 	} else {
-		// 		uniqueTos[key] += b.to[key]
-		// 	}
-		// })
 	})
 
+
+	Object.keys(TotalUniqueContracts).map(key => {
+		console.log(
+				chalk.green("\Contract Addr"), 
+				chalk.yellow(key),
+				// chalk.green("\tValue Sent"),
+				// chalk.yellow(TotalUniqueContracts[key])
+			)
+	})
+	Object.keys(TotalUniqueFroms).map(key => {
+		console.log(
+				chalk.green("\From Addr"), 
+				chalk.yellow(key),
+				chalk.green("\tValue Sent"),
+				chalk.yellow(TotalUniqueFroms[key])
+			)
+	})
+	Object.keys(TotalUniqueTos).map(key => {
+		console.log(
+				chalk.green("\To Addr"), 
+				chalk.yellow(key),
+				chalk.green("\tValue Sent"),
+				chalk.yellow(TotalUniqueTos[key])
+			)
+	})
+
+
 	console.log(
-		chalk.green("\tTotals"), 
+		chalk.green("\tTotal Sent"), 
 		chalk.yellow(TotalSent), 
 		chalk.green("\tTotal Txs"), 
 		chalk.yellow(TotalTransactions), 
 		chalk.green("\tUnique From Addr"), 
 		chalk.yellow(TotalUniqueSentAddr), 
-		chalk.green("\tUnique To Add"), 
+		chalk.green("\tUnique To Addr"), 
 		chalk.yellow(TotalUniqueReceivedAddr), 
 		chalk.green("\tContracts Created"), 
 		chalk.yellow(TotalContractsCreated),

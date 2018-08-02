@@ -24,6 +24,7 @@ let testBlock1Answer =  {
   number: 1,
   from: { kiel: -0.5419 },
   to: { truffle: 0.5419 },
+  contracts: { kiel: 0 },
   uniqueReceivedAddress: 1,
   uniqueSentAddresses: 1,
   transactionCount: 1,

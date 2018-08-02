@@ -9,7 +9,7 @@ readline = require("readline"),
 ropsten = process.env.ROPSTEN_ENDPOINT,
 mainNet = process.env.MAINNET_ENDPOINT,
 WSRopsten = process.env.WS_ROPSTEN_ENDPOINT,
-WSMainNet = process.env.WS_MAINNET_ENDPOINT;
+WSMainNet = process.env.WS_MAINNET_ENDPOINT || "wss://mainnet.infura.io/ws";
 
 let web3 = new Web3();
 

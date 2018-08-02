@@ -37,13 +37,12 @@
 -	3. Every unique contract address.
 
 
-To use this tool, you may either
+To use this tool, you can
  - Clone the repo
- - Install globally as a cli through npm.
 
  To get started with a clone,
  - Clone the repo from here: https://github.com/kielbarry/Web3BlockScanner.git
  - CD into that directory
- - Run npm install
+ - Run npm install --save
  - Run npm test
  - If there is a delay after test success, exit the program and run node app.js from the root of the directory

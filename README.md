@@ -45,4 +45,4 @@ To use this tool, you can
  - CD into that directory
  - Run npm install --save
  - Run npm test
- - If there is a delay after test success, exit the program and run node app.js from the root of the directory
+ - On success, exit the program and run nodemon app.js from the root of the directory

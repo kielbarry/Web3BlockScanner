@@ -2,7 +2,7 @@ This is a CLI program is an Ethereum block explorer using Web3.js and an Infura 
 
 You may supply the program either 
 	
--	1 a single number, which will be used to analyze all blocks between the current block (cb) and cb minus that number; or,
+-	1) a single number, which will be used to analyze all blocks between the current block (cb) and cb minus that number; or,
 -	2) two numbers, each representing a blocknumber, which will be used to analyze those blocks inclusive, as well as those in between.
 	*
 
